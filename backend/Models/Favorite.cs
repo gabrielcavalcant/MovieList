@@ -9,5 +9,7 @@
         public string PosterUrl { get; set; }
         public string Overview { get; set; }
         public string ReleaseDate { get; set; }
+
+        public bool IsFavorite { get; set; }
     }
 }
