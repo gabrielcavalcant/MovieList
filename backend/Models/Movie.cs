@@ -7,5 +7,9 @@ public class Movie
     public string Overview { get; set; }
     public double Rating { get; set; }
     public string PosterPath { get; set; } 
-    public string PosterUrl { get; set; } 
+    public string PosterUrl { get; set; }
+
+    public string ReleaseDate { get; set; }
+
+    public bool IsFavorite { get; set; }
 }
