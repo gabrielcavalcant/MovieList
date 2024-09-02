@@ -1,16 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using backend.Services;
+using backend.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend
 {
@@ -23,33 +19,62 @@ namespace backend
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            // Adiciona os serviços do controlador
             services.AddControllers();
+
+            // Configura o Swagger para documentação da API
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "backend", Version = "v1" });
             });
+
+            // Configura o HttpClient para MovieService
+            services.AddHttpClient<MovieService>();
+
+            // Configura o DbContext para usar um banco de dados em memória
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseInMemoryDatabase("FavoritesDB"));
+
+            // Configura o CORS
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAnyOrigin",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin();
+                        builder.AllowAnyMethod();
+                        builder.AllowAnyHeader();
+                    });
+            });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
+                // Habilita a página de exceções para desenvolvimento
                 app.UseDeveloperExceptionPage();
+
+                // Configura o Swagger
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "backend v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "backend V1");
+                    c.RoutePrefix = string.Empty; // Swagger estará acessível na raiz
+                });
             }
 
-            app.UseHttpsRedirection();
+            // Configura o CORS
+            app.UseCors("AllowAnyOrigin");
 
+            // Configura o pipeline de requisições
             app.UseRouting();
 
             app.UseAuthorization();
 
+            // Mapeia os endpoints dos controladores
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
