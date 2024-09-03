@@ -16,6 +16,7 @@ import { ChevronLeft, ChevronRight, HeartIcon, HeartOff } from "lucide-react";
 import useUpdateUrl from "@/lib/updateUrl";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Item = {
   id: number;
@@ -36,11 +37,11 @@ export default function Home() {
   const [items, setItems] = useState<Item[]>([]);
   const [searchTerm, setSearchTerm] = useState(query);
 
-  // Query for fetching movies based on search term and pagination
   const { data, error, isFetching } = useQuery({
     queryKey: ["listagemFilmes", page, searchTerm],
     queryFn: async () => {
       try {
+        setItems([]);
         const response = await axios.get(
           searchTerm
             ? `/Movies/search?title=${searchTerm}&pageNumber=${page}&pageSize=25`
@@ -54,14 +55,14 @@ export default function Home() {
     },
   });
 
-  // Update items state when data changes
   useEffect(() => {
     if (data) {
       setItems(data.items || []);
+    } else {
+      setItems([]); // Limpa os itens se não houver dados
     }
   }, [data]);
 
-  // Handle favorite and unfavorite actions
   const { mutate: favorite } = useMutation({
     mutationFn: async (item: Item) => {
       const response = await axios.post("/Favorites", {
@@ -110,7 +111,6 @@ export default function Home() {
     },
   });
 
-  // Declare onPageChange before useEffect
   const onPageChange = useCallback(
     (newPage: number) => {
       updateUrl(newPage.toString(), "page");
@@ -120,11 +120,11 @@ export default function Home() {
 
   useEffect(() => {
     updateUrl(searchTerm, "query");
-    onPageChange(1); // Reset to the first page
-  }, [searchTerm, updateUrl, onPageChange]);
+  }, [searchTerm, updateUrl]);
 
   const handleSearch = () => {
-    setSearchTerm(searchTerm.trim()); // Trim any whitespace from the search term
+    setItems([]);
+    setSearchTerm(searchTerm.trim());
   };
 
   return (
@@ -139,11 +139,24 @@ export default function Home() {
         <Button onClick={handleSearch}>Search</Button>
       </div>
 
-      {isFetching && <div>Loading...</div>}
       {error && <div>Error loading movies.</div>}
 
       <div className="flex flex-wrap gap-4">
-        {items.length === 0 ? (
+        {isFetching ? (
+          Array.from({ length: 25 }).map((_, index) => (
+            <Card key={index} className="movie-item w-[300px]">
+              <CardContent>
+                <Skeleton className="h-[300px] w-[200px]" />
+              </CardContent>
+              <CardFooter className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-8 w-full" />
+              </CardFooter>
+            </Card>
+          ))
+        ) : items.length === 0 ? (
           <div>No movies found</div>
         ) : (
           items.map((item) => (
