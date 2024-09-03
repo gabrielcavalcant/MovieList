@@ -7,22 +7,14 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import {
-  ChevronLeft,
-  ChevronRight,
-  CoinsIcon,
-  HeartIcon,
-  HeartOff,
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ChevronLeft, ChevronRight, HeartIcon, HeartOff } from "lucide-react";
 import useUpdateUrl from "@/lib/updateUrl";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
 type Item = {
@@ -39,25 +31,37 @@ type Item = {
 export default function Home() {
   const pageParams = useSearchParams();
   const page = parseInt(pageParams.get("page") || "1", 10);
+  const query = pageParams.get("query") || "";
   const updateUrl = useUpdateUrl();
   const [items, setItems] = useState<Item[]>([]);
+  const [searchTerm, setSearchTerm] = useState(query);
 
-  const { data } = useQuery({
-    queryKey: ["listagemFilmes", page],
+  // Query for fetching movies based on search term and pagination
+  const { data, error, isFetching } = useQuery({
+    queryKey: ["listagemFilmes", page, searchTerm],
     queryFn: async () => {
-      const response = await axios.get(
-        `/Movies?pageNumber=${page}&pageSize=25`
-      );
-      return response.data;
+      try {
+        const response = await axios.get(
+          searchTerm
+            ? `/Movies/search?title=${searchTerm}&pageNumber=${page}&pageSize=25`
+            : `/Movies?pageNumber=${page}&pageSize=25`
+        );
+        return response.data;
+      } catch (error) {
+        console.error("API request failed:", error);
+        throw error;
+      }
     },
   });
 
+  // Update items state when data changes
   useEffect(() => {
     if (data) {
       setItems(data.items || []);
     }
   }, [data]);
 
+  // Handle favorite and unfavorite actions
   const { mutate: favorite } = useMutation({
     mutationFn: async (item: Item) => {
       const response = await axios.post("/Favorites", {
@@ -68,11 +72,10 @@ export default function Home() {
         posterUrl: item.posterUrl,
         overview: item.overview,
         releaseDate: item.releaseDate,
-        isFavorite: !item.isFavorite, // Alterna o valor do favorito
+        isFavorite: !item.isFavorite,
       });
 
       if (response.status === 200) {
-        // Atualiza o estado dos items
         setItems((prevItems) =>
           prevItems.map((prevItem) =>
             prevItem.id === item.id
@@ -89,7 +92,6 @@ export default function Home() {
   const { mutate: unfavorite } = useMutation({
     mutationKey: ["Desfavoritar"],
     mutationFn: async (item: Item) => {
-      console.log("Desfavoritando item:", item);
       const response = await axios.delete(`/Favorites/${item.id}`);
 
       if (response.status === 204) {
@@ -107,12 +109,39 @@ export default function Home() {
       return response.data;
     },
   });
-  const onPageChange = (newPage: number) => {
-    updateUrl(newPage.toString(), "page");
+
+  // Declare onPageChange before useEffect
+  const onPageChange = useCallback(
+    (newPage: number) => {
+      updateUrl(newPage.toString(), "page");
+    },
+    [updateUrl]
+  );
+
+  useEffect(() => {
+    updateUrl(searchTerm, "query");
+    onPageChange(1); // Reset to the first page
+  }, [searchTerm, updateUrl, onPageChange]);
+
+  const handleSearch = () => {
+    setSearchTerm(searchTerm.trim()); // Trim any whitespace from the search term
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-start justify-start ">
+    <main className="flex min-h-screen flex-col items-start justify-start">
+      <div className="flex w-full justify-between mb-4">
+        <Input
+          type="text"
+          placeholder="Search movies..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <Button onClick={handleSearch}>Search</Button>
+      </div>
+
+      {isFetching && <div>Loading...</div>}
+      {error && <div>Error loading movies.</div>}
+
       <div className="flex flex-wrap gap-4">
         {items.length === 0 ? (
           <div>No movies found</div>
@@ -170,6 +199,7 @@ export default function Home() {
           ))
         )}
       </div>
+
       <Pagination>
         <PaginationContent>
           <PaginationItem>
@@ -188,7 +218,7 @@ export default function Home() {
               <PaginationLink
                 className={
                   page === index + 1
-                    ? "bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground "
+                    ? "bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground"
                     : ""
                 }
                 href="#"
@@ -201,7 +231,6 @@ export default function Home() {
               </PaginationLink>
             </PaginationItem>
           ))}
-
           <PaginationItem>
             <Button
               size="icon"
