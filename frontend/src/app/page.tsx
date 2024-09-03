@@ -17,6 +17,14 @@ import useUpdateUrl from "@/lib/updateUrl";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 type Item = {
   id: number;
@@ -35,18 +43,19 @@ export default function Home() {
   const query = pageParams.get("query") || "";
   const updateUrl = useUpdateUrl();
   const [items, setItems] = useState<Item[]>([]);
-  const [searchTerm, setSearchTerm] = useState(query);
+  const [search, setSearch] = useState(query || "");
 
   const { data, error, isFetching } = useQuery({
-    queryKey: ["listagemFilmes", page, searchTerm],
+    queryKey: ["listagemFilmes", page, query],
     queryFn: async () => {
       try {
         setItems([]);
         const response = await axios.get(
-          searchTerm
-            ? `/Movies/search?title=${searchTerm}&pageNumber=${page}&pageSize=25`
+          query
+            ? `/Movies/search?title=${query}&pageNumber=${page}&pageSize=25`
             : `/Movies?pageNumber=${page}&pageSize=25`
         );
+        console.log(data);
         return response.data;
       } catch (error) {
         console.error("API request failed:", error);
@@ -118,25 +127,41 @@ export default function Home() {
     [updateUrl]
   );
 
-  useEffect(() => {
-    updateUrl(searchTerm, "query");
-  }, [searchTerm, updateUrl]);
-
-  const handleSearch = () => {
-    setItems([]);
-    setSearchTerm(searchTerm.trim());
+  const handleSearch = (searchValue: string) => {
+    updateUrl(searchValue, "query");
   };
+
+  useEffect(() => {
+    console.log(items);
+  }, [items]);
 
   return (
     <main className="flex min-h-screen flex-col items-start justify-start">
-      <div className="flex w-full justify-between mb-4">
-        <Input
-          type="text"
-          placeholder="Search movies..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <Button onClick={handleSearch}>Search</Button>
+      <div className="flex w-fit justify-between mb-4 p-2 gap-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch(search);
+          }}
+          className="flex gap-2"
+        >
+          <Input
+            type="text"
+            placeholder="Search movies..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button type="submit">Search</Button>
+        </form>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            handleSearch("");
+            setSearch("");
+          }}
+        >
+          X
+        </Button>
       </div>
 
       {error && <div>Error loading movies.</div>}
@@ -157,21 +182,75 @@ export default function Home() {
             </Card>
           ))
         ) : items.length === 0 ? (
-          <div>No movies found</div>
+          <div className="p-4 flex w-screen items-center justify-center">
+            No movies found.
+          </div>
         ) : (
           items.map((item) => (
             <Card key={item.id} className="movie-item w-[300px]">
-              <CardContent>
-                {item.posterUrl && (
-                  <Image
-                    src={item.posterUrl}
-                    alt={item.title}
-                    width={200}
-                    height={300}
-                    className="movie-poster"
-                  />
-                )}
-              </CardContent>
+              <Dialog>
+                <DialogTrigger>
+                  <CardContent className="cursor-pointer">
+                    {item.posterUrl && (
+                      <Image
+                        src={item.posterUrl}
+                        alt={item.title}
+                        width={200}
+                        height={300}
+                        className="movie-poster"
+                      />
+                    )}
+                  </CardContent>
+                </DialogTrigger>
+                <DialogContent>
+                  <div className="flex">
+                    {/* Imagem do filme */}
+                    {item.posterUrl && (
+                      <div className="flex-shrink-0">
+                        <Image
+                          src={item.posterUrl}
+                          alt={item.title}
+                          width={200}
+                          height={300}
+                          className="movie-poster"
+                        />
+                      </div>
+                    )}
+
+                    {/* Informações do filme */}
+                    <div className="flex-grow ml-4">
+                      <DialogHeader>
+                        <DialogTitle>{item.title}</DialogTitle>
+                        <DialogDescription>{item.overview}</DialogDescription>
+                      </DialogHeader>
+                      <div className="flex flex-col gap-2 mt-4">
+                        <p>
+                          Release Date:{" "}
+                          {new Date(item.releaseDate).toLocaleDateString(
+                            "pt-BR",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </p>
+                        <p>Rating: {item.rating}</p>
+                        <Button
+                          variant="ghost"
+                          className="flex gap-3"
+                          onClick={() => {
+                            item.isFavorite ? unfavorite(item) : favorite(item);
+                          }}
+                        >
+                          {item.isFavorite ? <HeartOff /> : <HeartIcon />}
+                          {item.isFavorite ? "Remover Favorito" : "Favoritar"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <CardFooter className="flex flex-col gap-2">
                 <CardTitle className="break-before-all text-center">
                   {item.title}
@@ -184,29 +263,6 @@ export default function Home() {
                   })}
                 </p>
                 <p>Rating: {item.rating}</p>
-                {item.isFavorite ? (
-                  <Button
-                    variant="ghost"
-                    className="flex gap-3"
-                    onClick={() => {
-                      unfavorite(item);
-                    }}
-                  >
-                    <HeartOff />
-                    Remover Favorito
-                  </Button>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    className="flex gap-3"
-                    onClick={() => {
-                      favorite(item);
-                    }}
-                  >
-                    <HeartIcon />
-                    Favoritar
-                  </Button>
-                )}
               </CardFooter>
             </Card>
           ))
