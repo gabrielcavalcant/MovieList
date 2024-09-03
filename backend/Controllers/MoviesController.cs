@@ -3,6 +3,10 @@ using backend.Services;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Microsoft.EntityFrameworkCore;
+using backend.Models;
+using backend.Data;
+using System.Collections.Generic;
 
 namespace backend.Controllers
 {
@@ -11,10 +15,12 @@ namespace backend.Controllers
     public class MoviesController : ControllerBase
     {
         private readonly MovieService _movieService;
+        private readonly ApplicationDbContext _context; //favorite Service parece
 
-        public MoviesController(MovieService movieService)
+        public MoviesController(MovieService movieService, ApplicationDbContext context)
         {
             _movieService = movieService;
+            _context = context;
         }
 
         [HttpGet("")]
@@ -22,6 +28,8 @@ namespace backend.Controllers
         {
             // Recupera todos os filmes do serviço
             var allMovies = await _movieService.GetAllMoviesAsync();
+            var favorites = _context.Favorites.ToList();
+
 
             // Calcula o total de itens e a quantidade total de páginas
             var totalItems = allMovies.Count();
@@ -32,6 +40,15 @@ namespace backend.Controllers
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
+
+            // Itera sobre os filmes paginados e verifica se são favoritos
+            foreach (var movie in paginatedMovies)
+            {
+                if (favorites.Any(fav => fav.MovieId == movie.Id)) // Supondo que 'favorites' tenha uma propriedade 'MovieId'
+                {
+                    movie.IsFavorite = true;
+                }
+            }
 
             // Cria a resposta com informações de paginação e filmes paginados
             var response = new
@@ -47,12 +64,6 @@ namespace backend.Controllers
         }
 
 
-        [HttpGet("popular")]
-        public async Task<IActionResult> GetPopularMovies()
-        {
-            var movies = await _movieService.GetPopularMoviesAsync();
-            return Ok(movies);
-        }
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchMovies(string title)
