@@ -18,8 +18,9 @@ namespace backend.Services
         }
         public async Task<IEnumerable<Movie>> GetAllMoviesAsync()
         {
-            var maxPages = 10; // Fixo para 10 páginas
+            var maxPages = 10; 
             var allMovies = new List<Movie>();
+
 
             for (int page = 1; page <= maxPages; page++)
             {
