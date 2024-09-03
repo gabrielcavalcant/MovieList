@@ -189,18 +189,47 @@ export default function Home() {
           items.map((item) => (
             <Card key={item.id} className="movie-item w-[300px]">
               <Dialog>
-                <DialogTrigger>
-                  <CardContent className="cursor-pointer">
-                    {item.posterUrl && (
-                      <Image
-                        src={item.posterUrl}
-                        alt={item.title}
-                        width={200}
-                        height={300}
-                        className="movie-poster"
-                      />
-                    )}
-                  </CardContent>
+                <DialogTrigger asChild>
+                  <div className="cursor-pointer">
+                    <CardContent>
+                      {item.posterUrl && (
+                        <Image
+                          src={item.posterUrl}
+                          alt={item.title}
+                          width={200}
+                          height={300}
+                          className="movie-poster"
+                        />
+                      )}
+                    </CardContent>
+
+                    <CardFooter className="flex flex-col gap-2">
+                      <CardTitle className="break-before-all text-center">
+                        {item.title}
+                      </CardTitle>
+                      <p>
+                        {new Date(item.releaseDate).toLocaleDateString(
+                          "pt-BR",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )}
+                      </p>
+                      <p>Rating: {item.rating}</p>
+                      <Button
+                        variant="ghost"
+                        className="flex gap-3"
+                        onClick={() => {
+                          item.isFavorite ? unfavorite(item) : favorite(item);
+                        }}
+                      >
+                        {item.isFavorite ? <HeartOff /> : <HeartIcon />}
+                        {item.isFavorite ? "Remover Favorito" : "Favoritar"}
+                      </Button>
+                    </CardFooter>
+                  </div>
                 </DialogTrigger>
                 <DialogContent>
                   <div className="flex">
@@ -251,19 +280,6 @@ export default function Home() {
                   </div>
                 </DialogContent>
               </Dialog>
-              <CardFooter className="flex flex-col gap-2">
-                <CardTitle className="break-before-all text-center">
-                  {item.title}
-                </CardTitle>
-                <p>
-                  {new Date(item.releaseDate).toLocaleDateString("pt-BR", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </p>
-                <p>Rating: {item.rating}</p>
-              </CardFooter>
             </Card>
           ))
         )}
