@@ -660,6 +660,36 @@
     --ring: 217.5 9.09% 17.25%;
   }
 }
+/* Estilo customizado para scrollbar vertical */
+::-webkit-scrollbar {
+  width: 18px;
+  height: 18px; /* Adicione esta linha para scrollbar horizontal */
+}
+ 
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--primary));
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+ 
+::-webkit-scrollbar-corner {
+  background-color: transparent ;
+}
+ 
+::-moz-selection { /* Code for Firefox */
+  color: hsl(var(--primary-foreground));
+  background: hsl(var(--primary));
+}
+ 
+::selection {
+  color: hsl(var(--primary-foreground));
+  background: hsl(var(--primary));
+}
 
 @layer base {
   * {
