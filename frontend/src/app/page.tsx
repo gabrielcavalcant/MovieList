@@ -20,7 +20,7 @@ import {
   ChevronRight as ChevronRightIcon,
 } from "lucide-react";
 import useUpdateUrl from "@/lib/updateUrl";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -44,6 +44,14 @@ type Item = {
 };
 
 export default function Home() {
+  return (
+    <Suspense>
+      <Page />
+    </Suspense>
+  );
+}
+
+function Page() {
   const pageParams = useSearchParams();
   const page = parseInt(pageParams.get("page") || "1", 10);
   const query = pageParams.get("query") || "";
