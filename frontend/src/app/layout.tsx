@@ -3,8 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 import Providers from "./Providers";
-import { Button } from "@/components/ui/button";
-import { CoinsIcon, Link } from "lucide-react";
+import { ThemeProvider } from "@/components/ui/theme-provider"
 import Navbar from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,10 +21,31 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
-          <Navbar />
-          {children}
-        </Providers>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          themes={[
+            "light",
+            "red-dark",
+            "green-dark",
+            "netflix-dark",
+            "nature",
+            "nature-dark",
+            "dracula",
+            "dracula-dark",
+            "laracon-dark",
+            "gold",
+            "gold-dark",
+            "discord",
+            "discord-dark",
+          ]}
+        >
+          <Providers>
+            <Navbar />
+            {children}
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );
