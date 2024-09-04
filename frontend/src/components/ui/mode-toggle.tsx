@@ -14,7 +14,6 @@ import {
 
 const themes = [
   "light",
-  "dark",
   "red-dark",
   "green-dark",
   "netflix-dark",
