@@ -53,6 +53,7 @@ export default function Home() {
 
   const { data, error, isFetching } = useQuery({
     queryKey: ["listagemFilmes", page, query],
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       try {
         setItems([]);
@@ -61,6 +62,7 @@ export default function Home() {
             ? `/Movies/search?title=${query}&pageNumber=${page}&pageSize=25`
             : `/Movies?pageNumber=${page}&pageSize=25`
         );
+
         console.log(data);
         return response.data;
       } catch (error) {
@@ -153,11 +155,11 @@ export default function Home() {
         >
           <Input
             type="text"
-            placeholder="Search movies..."
+            placeholder="Pesquisar filmes..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Button type="submit">Search</Button>
+          <Button type="submit">Pesquisar</Button>
         </form>
         <Button
           variant="ghost"
