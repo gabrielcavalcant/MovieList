@@ -12,7 +12,13 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, HeartIcon, HeartOff } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  HeartIcon,
+  HeartOff,
+  ChevronRight as ChevronRightIcon,
+} from "lucide-react";
 import useUpdateUrl from "@/lib/updateUrl";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -188,98 +194,109 @@ export default function Home() {
         ) : (
           items.map((item) => (
             <Card key={item.id} className="movie-item w-[300px]">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <div className="cursor-pointer">
-                    <CardContent>
-                      {item.posterUrl && (
-                        <Image
-                          src={item.posterUrl}
-                          alt={item.title}
-                          width={200}
-                          height={300}
-                          className="movie-poster"
-                        />
-                      )}
-                    </CardContent>
+              <CardContent>
+                {item.posterUrl && (
+                  <Image
+                    src={item.posterUrl}
+                    alt={item.title}
+                    width={200}
+                    height={300}
+                    className="movie-poster"
+                  />
+                )}
+              </CardContent>
 
-                    <CardFooter className="flex flex-col gap-2">
-                      <CardTitle className="break-before-all text-center">
-                        {item.title}
-                      </CardTitle>
-                      <p>
-                        {new Date(item.releaseDate).toLocaleDateString(
-                          "pt-BR",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )}
-                      </p>
-                      <p>Rating: {item.rating}</p>
+              <CardFooter className="flex flex-col gap-2">
+                <CardTitle className="break-before-all text-center">
+                  {item.title}
+                </CardTitle>
+                <p>
+                  {new Date(item.releaseDate).toLocaleDateString("pt-BR", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+                <p>Rating: {item.rating}</p>
+                <div className="flex flex-col items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    className="flex gap-3"
+                    onClick={() => {
+                      item.isFavorite ? unfavorite(item) : favorite(item);
+                    }}
+                  >
+                    {item.isFavorite ? <HeartOff /> : <HeartIcon />}
+                    {item.isFavorite ? "Remover Favorito" : "Favoritar"}
+                  </Button>
+
+                  {/* Botão Saiba mais */}
+                  <Dialog>
+                    <DialogTrigger asChild>
                       <Button
-                        variant="ghost"
-                        className="flex gap-3"
-                        onClick={() => {
-                          item.isFavorite ? unfavorite(item) : favorite(item);
-                        }}
+                        variant="outline"
+                        className="flex items-center gap-2"
                       >
-                        {item.isFavorite ? <HeartOff /> : <HeartIcon />}
-                        {item.isFavorite ? "Remover Favorito" : "Favoritar"}
+                        Saiba mais <ChevronRightIcon className="h-4 w-4" />
                       </Button>
-                    </CardFooter>
-                  </div>
-                </DialogTrigger>
-                <DialogContent>
-                  <div className="flex">
-                    {/* Imagem do filme */}
-                    {item.posterUrl && (
-                      <div className="flex-shrink-0">
-                        <Image
-                          src={item.posterUrl}
-                          alt={item.title}
-                          width={200}
-                          height={300}
-                          className="movie-poster"
-                        />
-                      </div>
-                    )}
+                    </DialogTrigger>
+                    <DialogContent>
+                      <div className="flex">
+                        {/* Imagem do filme */}
+                        {item.posterUrl && (
+                          <div className="flex-shrink-0">
+                            <Image
+                              src={item.posterUrl}
+                              alt={item.title}
+                              width={200}
+                              height={300}
+                              className="movie-poster"
+                            />
+                          </div>
+                        )}
 
-                    {/* Informações do filme */}
-                    <div className="flex-grow ml-4">
-                      <DialogHeader>
-                        <DialogTitle>{item.title}</DialogTitle>
-                        <DialogDescription>{item.overview}</DialogDescription>
-                      </DialogHeader>
-                      <div className="flex flex-col gap-2 mt-4">
-                        <p>
-                          Release Date:{" "}
-                          {new Date(item.releaseDate).toLocaleDateString(
-                            "pt-BR",
-                            {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            }
-                          )}
-                        </p>
-                        <p>Rating: {item.rating}</p>
-                        <Button
-                          variant="ghost"
-                          className="flex gap-3"
-                          onClick={() => {
-                            item.isFavorite ? unfavorite(item) : favorite(item);
-                          }}
-                        >
-                          {item.isFavorite ? <HeartOff /> : <HeartIcon />}
-                          {item.isFavorite ? "Remover Favorito" : "Favoritar"}
-                        </Button>
+                        {/* Informações do filme */}
+                        <div className="flex-grow ml-4">
+                          <DialogHeader>
+                            <DialogTitle>{item.title}</DialogTitle>
+                            <DialogDescription>
+                              {item.overview}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="flex flex-col gap-2 mt-4">
+                            <p>
+                              Release Date:{" "}
+                              {new Date(item.releaseDate).toLocaleDateString(
+                                "pt-BR",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )}
+                            </p>
+                            <p>Rating: {item.rating}</p>
+                            <Button
+                              variant="ghost"
+                              className="flex gap-3"
+                              onClick={() => {
+                                item.isFavorite
+                                  ? unfavorite(item)
+                                  : favorite(item);
+                              }}
+                            >
+                              {item.isFavorite ? <HeartOff /> : <HeartIcon />}
+                              {item.isFavorite
+                                ? "Remover Favorito"
+                                : "Favoritar"}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardFooter>
             </Card>
           ))
         )}
@@ -292,37 +309,43 @@ export default function Home() {
               size="icon"
               variant="ghost"
               onClick={() => {
-                onPageChange(page - 1);
+                if (data && data.hasPreviousPage) {
+                  onPageChange(page - 1);
+                }
               }}
+              disabled={page === 1}
             >
               <ChevronLeft />
             </Button>
           </PaginationItem>
-          {Array.from({ length: data?.totalPages || 1 }, (_, index) => (
-            <PaginationItem key={index} className="hover:bg-transparent">
-              <PaginationLink
-                className={
-                  page === index + 1
-                    ? "bg-primary text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground"
-                    : ""
-                }
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onPageChange(index + 1);
-                }}
-              >
-                {index + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
+
+          {/* Páginas */}
+          {data &&
+            Array.from({ length: data.totalPages }).map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onPageChange(index + 1);
+                  }}
+                  className={index + 1 === page ? "active" : ""}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
           <PaginationItem>
             <Button
               size="icon"
               variant="ghost"
               onClick={() => {
-                onPageChange(page + 1);
+                if (data && data.hasNextPage) {
+                  onPageChange(page + 1);
+                }
               }}
+              disabled={data && data.totalPages === page}
             >
               <ChevronRight />
             </Button>
