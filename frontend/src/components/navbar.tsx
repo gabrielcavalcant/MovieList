@@ -4,9 +4,11 @@ import { Button } from "./ui/button";
 import { CoinsIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ModeToggle } from "@/components/ui/mode-toggle"; // Certifique-se de importar o ModeToggle corretamente
 
 export default function Navbar() {
   const pathname = usePathname();
+  
   return (
     <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 bg-background">
       <Link
@@ -23,7 +25,7 @@ export default function Navbar() {
           Filmes
         </Link>
         <Link
-          href="favorites"
+          href="/favorites"
           className={
             pathname === "/favorites" ? "font-bold" : "text-muted-foreground"
           }
@@ -31,8 +33,9 @@ export default function Navbar() {
           Favoritos
         </Link>
       </nav>
-      <div className="flex items-center w-full gap-4 md:ml-auto md:gap-2 lg:gap-4">
-        <Button variant="ghost" size="icon" className="rounded-full ml-auto">
+      <div className="flex items-center ml-auto gap-4"> {/* Adiciona ml-auto para empurrar o conteúdo para a direita */}
+        <ModeToggle /> {/* Alinhado à direita */}
+        <Button variant="ghost" size="icon" className="rounded-full">
           <span className="sr-only">Toggle user menu</span>
         </Button>
       </div>
