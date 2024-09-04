@@ -108,7 +108,7 @@ export default function Favorites() {
                       onClick={() => {
                         item?.isFavorite
                           ? unfavorite(item.id)
-                          : favorite(item.id);
+                          : null;
                       }}
                     >
                       {item.isFavorite ? <HeartOff /> : <HeartIcon />}
@@ -167,7 +167,7 @@ export default function Favorites() {
                                 onClick={() => {
                                   item.isFavorite
                                     ? unfavorite(item.id)
-                                    : favorite(item);
+                                    : null;
                                 }}
                               >
                                 {item.isFavorite ? <HeartOff /> : <HeartIcon />}
