@@ -194,7 +194,7 @@ export default function Home() {
         ) : (
           items.map((item) => (
             <Card key={item.id} className="movie-item w-[300px]">
-              <CardContent>
+              <CardContent className="flex justify-center">
                 {item.posterUrl && (
                   <Image
                     src={item.posterUrl}
