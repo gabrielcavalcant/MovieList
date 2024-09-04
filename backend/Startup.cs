@@ -35,7 +35,7 @@ namespace backend
 
             // Configura o DbContext para usar um banco de dados em memória
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseInMemoryDatabase("FavoritesDB"));
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             // Configura o CORS
             services.AddCors(options =>
