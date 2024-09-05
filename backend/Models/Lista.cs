@@ -8,6 +8,6 @@ namespace backend.Models
         public string Name { get; set; }
 
         // Relação N -> N com Favorite
-        public ICollection<FavoriteList> FavoriteLists { get; set; }
+        public ICollection<Favorite> FavoriteMovies { get; set; } = new List<Favorite>();
     }
 }
