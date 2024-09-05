@@ -1,11 +1,13 @@
-﻿//namespace backend.Models
-//{
-//    public class FavoriteList
-//    {
-//        public int FavoriteId { get; set; }
-//        public Favorite Favorite { get; set; }
+﻿using backend.Models;
 
-//        public int ListId { get; set; }
-//        public List List { get; set; }
-//    }
-//}
+namespace backend.Models
+{
+    public class FavoriteList
+    {
+        public int ListId { get; set; }
+        public Lista Lista { get; set; }
+
+        public int FavoriteId { get; set; }
+        public Favorite Favorite { get; set; }
+    }
+}
