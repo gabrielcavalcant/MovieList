@@ -27,6 +27,24 @@ namespace backend.Controllers
                 .ToListAsync();
             return Ok(lists);
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetListById(int id)
+        {
+            // Busca a lista pelo ID e carrega os favoritos associados
+            var list = await _context.Listas
+                .Include(l => l.FavoriteMovies) // Carrega os favoritos associados à lista
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            // Verifica se a lista foi encontrada
+            if (list == null)
+            {
+                return NotFound(); // Retorna 404 se a lista não for encontrada
+            }
+
+            return Ok(list); // Retorna 200 com a lista e seus favoritos
+        }
+
+
 
         //// GET: api/Lists/{id}
         //[HttpGet("{id}")]
