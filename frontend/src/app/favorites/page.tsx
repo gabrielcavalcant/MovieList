@@ -5,8 +5,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { HeartOff, HeartIcon, ChevronRightIcon } from "lucide-react";
-import { useState, useEffect } from "react";
+import { HeartOff, HeartIcon, ChevronRightIcon, ShareIcon } from "lucide-react";
+import { useState, useEffect, FormEvent } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -16,6 +16,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 type Item = {
   id: number;
@@ -66,6 +68,8 @@ export default function Favorites() {
 
   return (
     <main className="flex min-h-screen flex-col items-start justify-start">
+      <ShareDialog />
+      <div className="p-4"></div>
       <div className="flex flex-wrap gap-4">
         {isLoading ? (
           Array.from({ length: 25 }).map((_, index) => <Skeleton key={index} />)
@@ -106,9 +110,7 @@ export default function Favorites() {
                       variant="ghost"
                       className="flex gap-3"
                       onClick={() => {
-                        item?.isFavorite
-                          ? unfavorite(item.id)
-                          : null;
+                        item?.isFavorite ? unfavorite(item.id) : null;
                       }}
                     >
                       {item.isFavorite ? <HeartOff /> : <HeartIcon />}
@@ -165,9 +167,7 @@ export default function Favorites() {
                                 variant="ghost"
                                 className="flex gap-3"
                                 onClick={() => {
-                                  item.isFavorite
-                                    ? unfavorite(item.id)
-                                    : null;
+                                  item.isFavorite ? unfavorite(item.id) : null;
                                 }}
                               >
                                 {item.isFavorite ? <HeartOff /> : <HeartIcon />}
@@ -190,3 +190,87 @@ export default function Favorites() {
     </main>
   );
 }
+
+const ShareDialog = () => {
+  const [input, setInput] = useState("");
+  const [listId, setListId] = useState<number | null>(null); // Estado para armazenar o id da lista
+
+  const {
+    mutate: shareList,
+    data: shareData,
+    isSuccess,
+    reset,
+  } = useMutation({
+    mutationKey: ["shareList"],
+    mutationFn: async (title: string) => {
+      const response = await axios.post("/Lists", {
+        name: title,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      // Armazena o id da lista quando a requisição for bem-sucedida
+      setListId(data.id);
+    },
+  });
+
+  const handleAddList = (e: React.FormEvent) => {
+    e.preventDefault();
+    shareList(input); // Chama a função de compartilhamento com o input
+  };
+
+  return (
+    <Dialog
+      onOpenChange={(open) => {
+        if (!open) {
+          setListId(null);
+          reset();
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button className="flex gap-2">
+          <ShareIcon />
+          Compartilhar favoritos
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        {!shareData && (
+          <form onSubmit={handleAddList} className="flex flex-col gap-4">
+            <DialogHeader>
+              <DialogTitle>Dê um nome para sua lista:</DialogTitle>
+            </DialogHeader>
+            <Input
+              placeholder="Digite aqui"
+              id="name"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <Button type="submit">Gerar link de compartilhamento</Button>
+          </form>
+        )}
+        {listId && (
+          <div className=" flex flex-col items-center justify-center">
+            <h1>Compartilhado com sucesso!</h1>
+            <div className="flex gap-2">
+              <Link href={`/list/${listId}`}>
+                <Button className="mt-4">Ver lista de favoritos</Button>
+              </Link>
+              <Button
+                variant="outline"
+                className="mt-4"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(
+                    `${window.location.origin}/list/${listId}`
+                  );
+                }}
+              >
+                Copiar Link
+              </Button>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
