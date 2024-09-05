@@ -62,7 +62,7 @@ namespace backend
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "backend V1");
-                    c.RoutePrefix = string.Empty; // Swagger estará acessível na raiz
+                    c.RoutePrefix = "swagger"; // Swagger será acessível via /swagger
                 });
             }
 
