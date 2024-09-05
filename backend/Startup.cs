@@ -21,10 +21,13 @@ namespace backend
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Adiciona os serviços do controlador
-            services.AddControllers();
+            // Adiciona os servi?os do controlador
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
 
-            // Configura o Swagger para documentação da API
+            // Configura o Swagger para documenta??o da API
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "backend", Version = "v1" });
@@ -33,7 +36,7 @@ namespace backend
             // Configura o HttpClient para MovieService
             services.AddHttpClient<MovieService>();
 
-            // Configura o DbContext para usar um banco de dados em memória
+            // Configura o DbContext para usar um banco de dados em mem?ria
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -54,7 +57,7 @@ namespace backend
         {
             if (env.IsDevelopment())
             {
-                // Habilita a página de exceções para desenvolvimento
+                // Habilita a p?gina de exce??es para desenvolvimento
                 app.UseDeveloperExceptionPage();
 
                 // Configura o Swagger
@@ -62,14 +65,14 @@ namespace backend
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "backend V1");
-                    c.RoutePrefix = "swagger"; // Swagger será acessível via /swagger
+                    c.RoutePrefix = "swagger"; // Swagger ser? acess?vel via /swagger
                 });
             }
 
             // Configura o CORS
             app.UseCors("AllowAnyOrigin");
 
-            // Configura o pipeline de requisições
+            // Configura o pipeline de requisi??es
             app.UseRouting();
 
             app.UseAuthorization();
