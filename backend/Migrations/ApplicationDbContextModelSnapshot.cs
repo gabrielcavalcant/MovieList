@@ -18,19 +18,19 @@ namespace backend.Migrations
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            modelBuilder.Entity("FavoriteList", b =>
+            modelBuilder.Entity("FavoriteLista", b =>
                 {
-                    b.Property<int>("FavoritesId")
+                    b.Property<int>("FavoriteMoviesId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ListsId")
                         .HasColumnType("integer");
 
-                    b.HasKey("FavoritesId", "ListsId");
+                    b.HasKey("FavoriteMoviesId", "ListsId");
 
                     b.HasIndex("ListsId");
 
-                    b.ToTable("FavoriteList");
+                    b.ToTable("FavoriteLista");
                 });
 
             modelBuilder.Entity("backend.Models.Favorite", b =>
@@ -66,7 +66,7 @@ namespace backend.Migrations
                     b.ToTable("Favorites");
                 });
 
-            modelBuilder.Entity("backend.Models.List", b =>
+            modelBuilder.Entity("backend.Models.Lista", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,18 +78,18 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Lists");
+                    b.ToTable("Listas");
                 });
 
-            modelBuilder.Entity("FavoriteList", b =>
+            modelBuilder.Entity("FavoriteLista", b =>
                 {
                     b.HasOne("backend.Models.Favorite", null)
                         .WithMany()
-                        .HasForeignKey("FavoritesId")
+                        .HasForeignKey("FavoriteMoviesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.List", null)
+                    b.HasOne("backend.Models.Lista", null)
                         .WithMany()
                         .HasForeignKey("ListsId")
                         .OnDelete(DeleteBehavior.Cascade)
