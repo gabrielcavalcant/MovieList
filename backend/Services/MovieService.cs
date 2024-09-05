@@ -46,8 +46,6 @@ namespace backend.Services
 
             return allMovies;
         }
-
-
         public async Task<IEnumerable<Movie>> GetPopularMoviesAsync()
         {
             var response = await _httpClient.GetAsync($"{_baseUrl}/movie/popular?api_key={_apiKey}");
