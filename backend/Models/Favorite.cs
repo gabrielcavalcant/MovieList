@@ -14,6 +14,6 @@ namespace backend.Models
         public bool IsFavorite { get; set; }
 
         // Relação N -> N com List, agora opcional
-        public ICollection<FavoriteList>? FavoriteLists { get; set; }
+        public ICollection<Lista> Lists { get; set; } = new List<Lista>();
     }
 }
