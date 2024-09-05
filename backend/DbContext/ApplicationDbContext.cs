@@ -11,21 +11,21 @@ namespace backend.Data
 
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<Lista> Listas { get; set; }
-        public DbSet<FavoriteList> FavoriteLists { get; set; }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<FavoriteList>()
-                .HasKey(fl => new { fl.FavoriteId, fl.ListId });
+        //public DbSet<FavoriteList> FavoriteLists { get; set; }
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    //modelBuilder.Entity<FavoriteList>()
+        //    //    .HasKey(fl => new { fl.FavoriteId, fl.ListId });
 
-            modelBuilder.Entity<FavoriteList>()
-                .HasOne(fl => fl.Favorite)
-                .WithMany(f => f.FavoriteLists)
-                .HasForeignKey(fl => fl.FavoriteId);
+        //    //modelBuilder.Entity<FavoriteList>()
+        //    //    .HasOne(fl => fl.Favorite)
+        //    //    .WithMany(f => f.FavoriteLists)
+        //    //    .HasForeignKey(fl => fl.FavoriteId);
 
-            modelBuilder.Entity<FavoriteList>()
-                .HasOne(fl => fl.Lista)
-                .WithMany(l => l.FavoriteLists)
-                .HasForeignKey(fl => fl.ListId);
-        }
+        //    //modelBuilder.Entity<FavoriteList>()
+        //    //    .HasOne(fl => fl.Lista)
+        //    //    .WithMany(l => l.FavoriteLists)
+        //    //    .HasForeignKey(fl => fl.ListId);
+        //}
     }
 }
