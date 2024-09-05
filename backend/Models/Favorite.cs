@@ -13,7 +13,7 @@ namespace backend.Models
         public string ReleaseDate { get; set; }
         public bool IsFavorite { get; set; }
 
-        // Relação N -> N com List
-        public ICollection<List> Lists { get; set; }
+        // Relação N -> N com List, agora opcional
+        public ICollection<FavoriteList>? FavoriteLists { get; set; }
     }
 }
